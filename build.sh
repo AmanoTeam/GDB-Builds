@@ -12,10 +12,10 @@ declare -r gmp_tarball='/tmp/gmp.tar.xz'
 declare -r gmp_directory='/tmp/gmp-6.3.0'
 
 declare -r mpfr_tarball='/tmp/mpfr.tar.xz'
-declare -r mpfr_directory='/tmp/mpfr-4.2.1'
+declare -r mpfr_directory='/tmp/mpfr-4.2.2'
 
 declare -r gdb_tarball='/tmp/gdb.tar.xz'
-declare -r gdb_directory='/tmp/gdb-16.2'
+declare -r gdb_directory='/tmp/gdb-16.3'
 
 declare -r optflags='-w -O2'
 declare -r linkflags='-Xlinker -s'
@@ -84,7 +84,7 @@ fi
 
 if ! [ -f "${mpfr_tarball}" ]; then
 	curl \
-		--url 'https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.1.tar.xz' \
+		--url 'https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.2.tar.xz' \
 		--retry '30' \
 		--retry-all-errors \
 		--retry-delay '0' \
@@ -101,7 +101,7 @@ fi
 
 if ! [ -f "${gdb_tarball}" ]; then
 	curl \
-		--url 'https://ftp.gnu.org/gnu/gdb/gdb-16.2.tar.xz' \
+		--url 'https://ftp.gnu.org/gnu/gdb/gdb-16.3.tar.xz' \
 		--retry '30' \
 		--retry-all-errors \
 		--retry-delay '0' \
