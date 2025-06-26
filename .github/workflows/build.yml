@@ -105,7 +105,7 @@ jobs:
             
             export PINO_HOME='/tmp/pino'
             export PATH="${PINO_HOME}/bin:${PATH}"
-            
+            sed -i 's/__inline/__inline __always_inline/g' /tmp/pino/*/include/bits/threads_inlines.h
             source "${PINO_HOME}/usr/local/share/pino/autotools/${{ matrix.target }}.sh"
         fi
         
