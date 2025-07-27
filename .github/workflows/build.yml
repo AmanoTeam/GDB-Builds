@@ -67,7 +67,7 @@ jobs:
             curl --connect-timeout '10' --retry '15' --retry-all-errors --fail --silent --location --url "${OBGGCC_URL}" --output "${OBGGCC_TARBALL}"
             tar --directory="$(dirname "${OBGGCC_TARBALL}")" --extract --file="${OBGGCC_TARBALL}"
             
-            export OBGGCC_HOME='/tmp/obggcc-toolchain'
+            export OBGGCC_HOME='/tmp/obggcc'
             export PATH="${OBGGCC_HOME}/bin:${PATH}"
             
             source "${OBGGCC_HOME}/usr/local/share/obggcc/autotools/${{ matrix.target }}.sh"

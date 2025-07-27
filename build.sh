@@ -39,6 +39,14 @@ declare -ra targets=(
 	'arm-unknown-linux-gnueabihf'
 	'hppa-unknown-linux-gnu'
 	'i386-unknown-linux-gnu'
+	'x86_64-unknown-linux-android'
+	'i686-unknown-linux-android'
+	'aarch64-unknown-linux-android'
+	'riscv64-unknown-linux-android'
+	'armv5-unknown-linux-androideabi'
+	'armv7-unknown-linux-androideabi'
+	'mips64el-unknown-linux-android'
+	'mipsel-unknown-linux-android'
 )
 
 declare build_type="${1}"
