@@ -5,6 +5,8 @@ on:
     branches:
         - '**'
 
+permissions: write-all
+
 jobs:
   cross-build:
     name: 'Cross build'
@@ -60,11 +62,11 @@ jobs:
             
             source "${RAIDEN_HOME}/usr/local/share/raiden/autotools/${{ matrix.target }}.sh"
         elif [[ '${{ matrix.target }}' == *'-linux-gnu'* ]]; then
-            declare -r OBGGCC_TAG="$(jq --raw-output '.tag_name' <<< "$(curl --connect-timeout '10' --retry '15' --retry-all-errors --fail --silent --url 'https://api.github.com/repos/AmanoTeam/obggcc/releases/latest')")"
+            declare -r OBGGCC_TAG="$(jq --raw-output '.tag_name' <<< "$(curl -v --connect-timeout '10' --retry '15' --retry-all-errors --fail --silent --url 'https://api.github.com/repos/AmanoTeam/obggcc/releases/latest')")"
             declare -r OBGGCC_TARBALL='/tmp/toolchain.tar.xz'
             declare -r OBGGCC_URL="https://github.com/AmanoTeam/obggcc/releases/download/${OBGGCC_TAG}/x86_64-unknown-linux-gnu.tar.xz"
             
-            curl --connect-timeout '10' --retry '15' --retry-all-errors --fail --silent --location --url "${OBGGCC_URL}" --output "${OBGGCC_TARBALL}"
+            curl -v --connect-timeout '10' --retry '15' --retry-all-errors --fail --silent --location --url "${OBGGCC_URL}" --output "${OBGGCC_TARBALL}"
             tar --directory="$(dirname "${OBGGCC_TARBALL}")" --extract --file="${OBGGCC_TARBALL}"
             
             export OBGGCC_HOME='/tmp/obggcc'
@@ -125,3 +127,24 @@ jobs:
         path: |
           /tmp/${{ env.CROSS_COMPILE_TRIPLET }}.tar.xz
           /tmp/${{ env.CROSS_COMPILE_TRIPLET }}.tar.xz.sha256
+
+  release:
+    needs: cross-build
+    runs-on: ubuntu-latest
+    name: Create release
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@main
+      - name: Create release
+        uses: softprops/action-gh-release@master
+        with:
+          tag_name: gdb
+          name: GNU Debugger
+          files: ./*/*.tar.xz*
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          body: "* Release GDB"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
