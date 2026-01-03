@@ -24,12 +24,13 @@ declare -r zstd_directory='/tmp/zstd-dev'
 declare -r ccflags='-w -O2'
 declare -r linkflags='-Xlinker -s'
 
-declare -r max_jobs='15'
+declare -r max_jobs='30'
 
 declare -ra targets=(
 	'x86_64-unknown-linux-gnu'
 	'aarch64-unknown-linux-gnu'
 	'arm-unknown-linux-gnueabi'
+	'armv6-unknown-linux-gnueabi'
 	'arm-unknown-linux-gnueabihf'
 	'i386-unknown-linux-gnu'
 	'x86_64-unknown-linux-android'
