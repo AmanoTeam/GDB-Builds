@@ -161,7 +161,7 @@ fi
 
 if ! [ -f "${gdb_tarball}" ]; then
 	curl \
-		--url 'https://github.com/AmanoTeam/binutils-snapshots/releases/latest/download/gdb.tar.xz' \
+		--url 'https://ftp.gnu.org/gnu/gdb/gdb-16.3.tar.xz' \
 		--retry '30' \
 		--retry-all-errors \
 		--retry-delay '0' \
@@ -175,7 +175,9 @@ if ! [ -f "${gdb_tarball}" ]; then
 		--extract \
 		--file="${gdb_tarball}"
 	
-	mv "${install_prefix}" "${gdb_directory}"
+	# mv "${install_prefix}" "${gdb_directory}"
+	
+	mv '/tmp/gdb-16.3' "${gdb_directory}"
 	
 	echo 'UNSUPPORTED=1' >> "${gdb_directory}/gdbserver/configure.srv"
 	
