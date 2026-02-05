@@ -1,6 +1,11 @@
 name: Build
 
 on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    branches:
+        - '**'
   push:
     branches:
         - '**'
@@ -24,24 +29,14 @@ jobs:
           # Linux (musl)
           'aarch64-unknown-linux-musl',
           'x86_64-unknown-linux-musl',
-          'arm-unknown-linux-musleabihf',
+          'armv6-unknown-linux-musleabihf',
+          'armv7-unknown-linux-musleabihf',
           'i386-unknown-linux-musl',
-          'armv7l-unknown-linux-musleabihf',
           
           # FreeBSD
           'x86_64-unknown-freebsd',
           'aarch64-unknown-freebsd',
           'i386-unknown-freebsd',
-         
-          # NetBSD
-          'i386-unknown-netbsdelf',
-          'x86_64-unknown-netbsd',
-          
-          # Android
-          'x86_64-unknown-linux-android',
-          'i686-unknown-linux-android',
-          'arm-unknown-linux-androideabi',
-          'aarch64-unknown-linux-android'
         ]
     steps:
     - uses: actions/checkout@main
