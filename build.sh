@@ -180,6 +180,7 @@ if ! [ -f "${gdb_tarball}" ]; then
 	echo 'UNSUPPORTED=1' >> "${gdb_directory}/gdbserver/configure.srv"
 	
 	patch --directory="${gdb_directory}" --strip='1' --input="${workdir}/patches/0001-Add-relative-RPATHs-to-GDB-tools.patch"
+	patch --directory="${gdb_directory}" --strip='1' --input="${workdir}/patches/0002-Fix-GDB-build-on-Android.patch"
 fi
 
 sed \
