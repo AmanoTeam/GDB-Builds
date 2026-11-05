@@ -37,14 +37,29 @@ jobs:
           'x86_64-unknown-freebsd',
           'aarch64-unknown-freebsd',
           'i386-unknown-freebsd',
+
+          # Android (API level 21)
+          'aarch64-unknown-linux-android21',
+          'armv7-unknown-linux-androideabi21',
+          'i686-unknown-linux-android21',
+          'x86_64-unknown-linux-android21',
         ]
     steps:
     - uses: actions/checkout@main
       with:
         submodules: true
     - name: Cross-compile GDB to ${{ matrix.target }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        if [[ '${{ matrix.target }}' = *'-linux-musl'* ]]; then
+        if [[ '${{ matrix.target }}' = *'-android'* ]]; then
+            bash './tools/setup-android-toolchain.sh'
+
+            export PINO_HOME='/tmp/android-gcc-cross'
+            export PATH="${PINO_HOME}/bin:${PATH}"
+
+            source "${PINO_HOME}/build/autotools/${{ matrix.target }}.sh"
+        elif [[ '${{ matrix.target }}' = *'-linux-musl'* ]]; then
             declare -r RAIDEN_TAG="$(jq --raw-output '.tag_name' <<< "$(curl --connect-timeout '10' --retry '15' --retry-all-errors --fail --silent --url 'https://api.github.com/repos/AmanoTeam/musl-gcc-cross/releases/latest')")"
             declare -r RAIDEN_TARBALL='/tmp/toolchain.tar.xz'
             declare -r RAIDEN_URL="https://github.com/AmanoTeam/musl-gcc-cross/releases/download/${RAIDEN_TAG}/x86_64-unknown-linux-gnu.tar.xz"
@@ -86,7 +101,13 @@ jobs:
         
         echo "CROSS_COMPILE_TRIPLET=${CROSS_COMPILE_TRIPLET}" >> "${GITHUB_ENV}"
         
-        bash './build.sh' "${CROSS_COMPILE_TRIPLET}"
+        if [[ '${{ matrix.target }}' = *'-android'* ]]; then
+            echo "GDB_PACKAGE_NAME=${{ matrix.target }}" >> "${GITHUB_ENV}"
+            bash './build-android.sh'
+        else
+            echo "GDB_PACKAGE_NAME=${CROSS_COMPILE_TRIPLET}" >> "${GITHUB_ENV}"
+            bash './build.sh' "${CROSS_COMPILE_TRIPLET}"
+        fi
     - name: Create logs
       if: always()
       run: |
@@ -107,17 +128,17 @@ jobs:
             /tmp/logs.tar.xz
     - name: Generate tarball
       run: |
-        declare tarball_filename='/tmp/${{ env.CROSS_COMPILE_TRIPLET }}.tar.xz'
+        declare tarball_filename="/tmp/${GDB_PACKAGE_NAME}.tar.xz"
         tar --directory='/tmp' --create --file=- 'gdb' | xz --threads='0' --compress -9 > "${tarball_filename}"
         sha256sum "${tarball_filename}" | sed 's|/tmp/||' > "${tarball_filename}.sha256"
     - name: Upload artifact
       uses: actions/upload-artifact@main
       with:
-        name: ${{ env.CROSS_COMPILE_TRIPLET }}
+        name: ${{ env.GDB_PACKAGE_NAME }}
         if-no-files-found: error
         path: |
-          /tmp/${{ env.CROSS_COMPILE_TRIPLET }}.tar.xz
-          /tmp/${{ env.CROSS_COMPILE_TRIPLET }}.tar.xz.sha256
+          /tmp/${{ env.GDB_PACKAGE_NAME }}.tar.xz
+          /tmp/${{ env.GDB_PACKAGE_NAME }}.tar.xz.sha256
 
   release:
     needs: cross-build

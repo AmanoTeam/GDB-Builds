@@ -1,0 +1,55 @@
+diff --git a/gdb/aarch64-linux-tdep.c b/gdb/aarch64-linux-tdep.c
+index 77c2679042c..f1460317e5f 100644
+--- a/gdb/aarch64-linux-tdep.c
++++ b/gdb/aarch64-linux-tdep.c
+@@ -2728,7 +2728,7 @@ aarch64_linux_report_signal_info (struct gdbarch *gdbarch,
+     return;
+ 
+   CORE_ADDR fault_addr = 0;
+-  long si_code = 0, si_errno = 0, si_pkey = -1;
++  long si_code = 0, si_errno = 0, protection_key = -1;
+ 
+   try
+     {
+@@ -2739,7 +2739,7 @@ aarch64_linux_report_signal_info (struct gdbarch *gdbarch,
+       si_code = parse_and_eval_long (gdb_si::get (si_key::siginfo_code));
+       si_errno = parse_and_eval_long (gdb_si::get (si_key::siginfo_errno));
+       if (tdep->has_poe ())
+-	si_pkey = parse_and_eval_long (gdb_si::get (si_key::siginfo_pkey));
++	protection_key = parse_and_eval_long (gdb_si::get (si_key::siginfo_pkey));
+ 
+       fault_addr
+ 	= parse_and_eval_long (gdb_si::get (si_key::siginfo_addr));
+@@ -2796,7 +2796,7 @@ aarch64_linux_report_signal_info (struct gdbarch *gdbarch,
+       uiout->text (_(" while accessing address "));
+       uiout->field_core_addr ("fault-addr", gdbarch, fault_addr);
+       uiout->text (_(" with Protection Key = "));
+-      uiout->field_signed ("protection-key", si_pkey);
++      uiout->field_signed ("protection-key", protection_key);
+     }
+   else if (si_code != AARCH64_SEGV_CPERR)
+     {
+diff --git a/gnulib/configure b/gnulib/configure
+index de2f5c4cec1..56091b5dfdd 100755
+--- a/gnulib/configure
++++ b/gnulib/configure
+@@ -26969,6 +26969,7 @@ $as_echo "#define GNULIB_TEST_GETTIMEOFDAY 1" >>confdefs.h
+ 
+   if test $ac_cv_func_glob = no; then
+     HAVE_GLOB=0
++    REPLACE_GLOB=1
+   else
+ 
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GNU glob interface version 1 or 2" >&5
+diff --git a/gnulib/import/m4/glob.m4 b/gnulib/import/m4/glob.m4
+index f59b84ff057..d6404adb48c 100644
+--- a/gnulib/import/m4/glob.m4
++++ b/gnulib/import/m4/glob.m4
+@@ -15,6 +15,7 @@ AC_DEFUN([gl_GLOB],
+   AC_CHECK_FUNCS_ONCE([glob glob_pattern_p])
+   if test $ac_cv_func_glob = no; then
+     HAVE_GLOB=0
++    REPLACE_GLOB=1
+   else
+ 
+     AC_CACHE_CHECK([for GNU glob interface version 1 or 2],
