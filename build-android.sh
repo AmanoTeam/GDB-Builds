@@ -10,7 +10,7 @@ declare -r gdb_tarball="${GDB_TARBALL:-${work_root}/gdb.tar.xz}"
 declare -r gdb_directory="${GDB_SOURCE_DIR:-${work_root}/gdb-source}"
 declare -r build_directory="${GDB_BUILD_DIR:-${gdb_directory}/build-android}"
 
-declare -r ccflags='-O2'
+declare -r ccflags='-D__BIONIC_DEPRECATED_PAGE_SIZE_MACRO -O2'
 declare -r max_jobs="${GDB_BUILD_PARALLEL_LEVEL:-$(nproc)}"
 
 : "${PINO_HOME:?Set PINO_HOME to the android-gcc-cross installation directory}"
